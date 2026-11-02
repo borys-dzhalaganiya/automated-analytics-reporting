@@ -1,0 +1,27 @@
+# API keys and environment variables
+.env
+.env.*
+
+# Python virtual environment
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Generated reports and logs
+output/
+*.log
+
+# Local datasets
+data/
+
+# macOS
+.DS_Store
+
+# Local backups
+main_backup.py
+
+# Local launchd configuration
+com.reportautomation.daily.plist
