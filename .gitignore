@@ -1,6 +1,7 @@
 # API keys and environment variables
 .env
 .env.*
+!.env.example
 
 # Python virtual environment
 .venv/
@@ -25,3 +26,9 @@ main_backup.py
 
 # Local launchd configuration
 com.reportautomation.daily.plist
+
+# Local experimental scripts
+ai_test.py
+api_test.py
+pdf_test.py
+python test_bigquery.py

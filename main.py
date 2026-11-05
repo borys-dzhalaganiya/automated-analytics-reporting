@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import json
+import os
+from dotenv import load_dotenv
+from openai import OpenAI
 from ai_analysis import get_report_analysis
 from pathlib import Path
 from google.cloud import bigquery
@@ -87,11 +90,22 @@ def create_charts(report):
     plt.close()
 
 def load_from_bigquery():
-    client = bigquery.Client(project='bigquery-learning-486013')
+    load_dotenv(BASE_DIR / ".env")
 
-    query = """
+    project_id = os.getenv("BIGQUERY_PROJECT_ID")
+    dataset_id = os.getenv("BIGQUERY_DATASET", "report_automation")
+    table_id = os.getenv("BIGQUERY_TABLE", "applications")
+
+    if not project_id:
+        raise ValueError("BIGQUERY_PROJECT_ID is not configured")
+
+    client = bigquery.Client(project=project_id)
+
+    table_path = f"{project_id}.{dataset_id}.{table_id}"
+
+    query = f"""
         SELECT *
-        FROM `bigquery-learning-486013.report_automation.applications`
+        FROM `{table_path}`
     """
 
     df = client.query(query).to_dataframe()
@@ -421,11 +435,21 @@ def main():
 
     pivot, insights = analyze_sources(report)
 
+    load_dotenv()
+
+    use_ai = os.getenv("USE_AI", "false").lower() == "true"
+    api_key = os.getenv("OPENAI_API_KEY")
+
+    client = None
+
+    if use_ai and api_key and api_key != "test_key_123":
+        client = OpenAI(api_key=api_key)
+
     message = get_report_analysis(
         report=report,
         pivot=pivot,
         insights=insights,
-        client=None
+        client=client
     )
 
     json_text = json.dumps(insights, indent=4)
